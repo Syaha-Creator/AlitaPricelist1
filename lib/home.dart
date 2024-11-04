@@ -78,7 +78,6 @@ class _HomeState extends State<Home> {
           return 0.0;
         }).toList();
 
-        // Panggilan `setState` hanya sekali
         setState(() {
           apiData = results;
           areaList = areas;
