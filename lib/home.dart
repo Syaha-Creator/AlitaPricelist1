@@ -398,6 +398,10 @@ class _HomeState extends State<Home> {
           ),
           actions: [
             TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
               onPressed: () {
                 currentNetPrice = hitungHargaNet(
                   originalPrice,
@@ -418,10 +422,6 @@ class _HomeState extends State<Home> {
                 updateTotalDiskonInSearchResults(index, totalDiskonBaru, currentNetPrice);
               },
               child: const Text('Hitung Harga'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
             ),
           ],
         );
@@ -860,8 +860,8 @@ class _HomeState extends State<Home> {
                                 _buildRow('Headboard', result['headboard']),
                                 _buildRow('Sorong', result['sorong']),
                                 _buildRow('Ukuran', result['ukuran']),
-                                _buildRow('Price List', result['price_list']),
                                 _buildRow('Program', result['program']),
+                                _buildRow('Price List', result['price_list']),
                                 const SizedBox(
                                     height: 5), // Add space between sections
                                 const Text(
