@@ -301,6 +301,7 @@ class _HomeState extends State<Home> {
       originalPrice = await fetchEndUserPrice();
       currentNetPrice = originalPrice;
     }
+
     double priceList = await fetchPricelist();
 
     if (originalPrice == 0) {
@@ -398,8 +399,27 @@ class _HomeState extends State<Home> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              onPressed: () {
+                setState(() {
+                  appliedDisc1 = 0;
+                  appliedDisc2 = 0;
+                  appliedDisc3 = 0;
+                  appliedDisc4 = 0;
+                  appliedDisc5 = 0;
+                  currentNetPrice = originalPrice;
+                  totalDiskonUpdated = priceList - currentNetPrice;
+                });
+
+                // Tutup dialog
+                Navigator.of(context).pop();
+                updateTotalDiskonInSearchResults(index, totalDiskonUpdated ?? 0, currentNetPrice);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Diskon berhasil direset!'),
+                  ),
+                );
+              },
+              child: const Text('Reset'),
             ),
             TextButton(
               onPressed: () {
