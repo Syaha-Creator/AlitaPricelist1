@@ -448,6 +448,10 @@ class _HomeState extends State<Home> {
           ),
           actions: [
             TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
               onPressed: () async {
                 double newHargaNet = double.tryParse(hargaNetController.text) ?? 0;
                 if (newHargaNet > 0) {
@@ -485,10 +489,6 @@ class _HomeState extends State<Home> {
                 }
               },
               child: const Text('Save'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
             ),
           ],
         );
