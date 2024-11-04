@@ -433,6 +433,69 @@ class _HomeState extends State<Home> {
   return originalPrice * (1 - disc1) * (1 - disc2) * (1 - disc3) * (1 - disc4) * (1 - disc5);
   }
 
+  void showInputHargaNetPopup(int index) {
+    TextEditingController hargaNetController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Harga Net'),
+          content: TextField(
+            controller: hargaNetController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: 'Masukkan Harga Net baru'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                double newHargaNet = double.tryParse(hargaNetController.text) ?? 0;
+                if (newHargaNet > 0) {
+                  double priceList = await fetchPricelist();
+                  
+                  if (priceList > 0) {
+                    double newTotalDiskon = priceList - newHargaNet;
+
+                    setState(() {
+                      searchResults[index]['harga_net'] =
+                          NumberFormat.currency(locale: 'id_ID', symbol: 'Rp. ', decimalDigits: 0).format(newHargaNet);
+                      searchResults[index]['total_diskon'] =
+                          NumberFormat.currency(locale: 'id_ID', symbol: 'Rp. ', decimalDigits: 0).format(newTotalDiskon);
+                    });
+
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Harga Net berhasil diperbarui!'),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Gagal mengambil harga pricelist. Coba lagi nanti.'),
+                      ),
+                    );
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Masukkan nilai Harga Net yang valid.'),
+                    ),
+                  );
+                }
+              },
+              child: const Text('Save'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _resetLists() {
     setState(() {
     apiData = [];
@@ -817,17 +880,14 @@ class _HomeState extends State<Home> {
                                 _buildRow('Harga Net', result['harga_net']),
 
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     ElevatedButton(
                                       onPressed: () => showCicilanPopup(result),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color.fromRGBO(
-                                            37, 211, 102, 1),
+                                        backgroundColor: const Color.fromRGBO(37, 211, 102, 1),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
                                       ),
                                       child: const Text(
@@ -837,9 +897,19 @@ class _HomeState extends State<Home> {
                                     ),
                                     IconButton(
                                       onPressed: () {
-                                        // Memeriksa apakah ada harga yang lebih dari 0
-                                        if (hargaList.any((endUserPrice) =>
-                                            endUserPrice > 0)) {
+                                        showInputHargaNetPopup(index);
+                                      },
+                                      icon: const Icon(Icons.edit),
+                                      color: Colors.white,
+                                      tooltip: 'Edit HargaNet',
+                                      style: IconButton.styleFrom(
+                                        backgroundColor: Colors.blue,
+                                        shape: const CircleBorder(),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        if (hargaList.any((endUserPrice) => endUserPrice > 0)) {
                                           Map<String, double> batasDiskon = {
                                             "disc1": 0.1,
                                             "disc2": 0.05,
@@ -848,44 +918,30 @@ class _HomeState extends State<Home> {
                                             "disc5": 0.05,
                                           };
 
-                                          // Ambil hargaNet dari item yang dipilih
                                           double selectedHargaNet = 0;
 
-                                          String hargaNetString =
-                                              searchResults[index]
-                                                      ['harga_net'] ??
-                                                  '0';
+                                          String hargaNetString = searchResults[index]['harga_net'] ?? '0';
 
-                                          NumberFormat currencyFormatter =
-                                              NumberFormat.currency(
-                                                  locale: 'id_ID',
-                                                  symbol: 'Rp. ');
-
-                                          // Parsing 'harga_net' menjadi double
-                                          selectedHargaNet = currencyFormatter
-                                              .parse(hargaNetString)
-                                              .toDouble();
-                                          // logger.i(
-                                          //     'Parsed selectedHargaNet: $selectedHargaNet');
+                                          NumberFormat currencyFormatter = NumberFormat.currency(
+                                            locale: 'id_ID',
+                                            symbol: 'Rp. ',
+                                          );
+                                          
+                                          selectedHargaNet = currencyFormatter.parse(hargaNetString).toDouble();
 
                                           if (selectedHargaNet > 0) {
-                                            showDiskonPopup(index,
-                                                selectedHargaNet, batasDiskon);
+                                            showDiskonPopup(index, selectedHargaNet, batasDiskon);
                                           } else {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
+                                            ScaffoldMessenger.of(context).showSnackBar(
                                               const SnackBar(
-                                                content: Text(
-                                                    'Harga belum tersedia, coba lagi nanti'),
+                                                content: Text('Harga belum tersedia, coba lagi nanti'),
                                               ),
                                             );
                                           }
                                         } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
+                                          ScaffoldMessenger.of(context).showSnackBar(
                                             const SnackBar(
-                                              content: Text(
-                                                  'Harga belum tersedia, coba lagi nanti'),
+                                              content: Text('Harga belum tersedia, coba lagi nanti'),
                                             ),
                                           );
                                         }
@@ -900,6 +956,7 @@ class _HomeState extends State<Home> {
                                     ),
                                   ],
                                 ),
+
                               ],
                             ),
                           ),
